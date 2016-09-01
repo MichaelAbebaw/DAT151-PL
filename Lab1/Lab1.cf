@@ -1,0 +1,133 @@
+------------------------------ PROGRAMS -----------------------------------
+Prog.		Program ::= [Def];
+terminator Def "";
+
+----------------------------- DEFINITIONS ---------------------------------
+DUsing.		Def ::= "using" QConstant ";" ;
+Defn.		Def ::= Type Id "(" [Arg] ")" ";" ;
+DFun.		Def ::= Type Id "(" [Arg] ")" "{" [Stm] "}" ;
+DIn1.		Def ::= "inline" Type Id "(" [Arg] ")" "{" [Stm] "}" ;
+DIn2.		Def ::= "inline" Type Id "(" [Arg] ")" ";" ;
+DTyp.		Def ::= "typedef" Type Id ";";
+DVar.		Def ::= Variable ";" ;
+DStruct.	Def ::= "struct" Id "{" [Def] "}" ";";
+
+---------------------------- STATEMENTS ----------------------------------
+
+SType.		Stm ::= "typedef" Type Id ";" ;
+SExp.		Stm ::= Exp ";" ;
+SRet.		Stm ::= "return" Exp ";" ;
+SWhile.		Stm ::= "while" "(" Exp ")" Stm;
+SDoWhile.	Stm ::= "do" Stm "while" "(" Exp ")" ;
+SFor.		Stm ::= "for" "(" Variable ";" Exp ";" Exp ")" Stm;
+SIf.		Stm ::= "if" "(" Exp ")" Stm;
+SIfElse.	Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
+SBody.		Stm ::= "{" [Stm] "}" ;
+SStruct.	Stm ::= "struct" Id "{" [Def] "}" ";";
+SSemCln.	Stm ::= ";" ;
+SVariable.	Stm ::= Variable ";";
+terminator Stm "";
+
+---------------------------- EXPRESSIONS ----------------------------------
+-- level 16
+EInt.		Exp16 ::= Integer;
+EString.	Exp16 ::= [String];
+EDouble.	Exp16 ::= Double;
+EChar.		Exp16 ::= Char;
+EQConstant.	Exp16 ::= QConstant;
+separator nonempty String "";
+
+-- level 15
+EIndex.		Exp15 ::= Exp16 "[" Exp "]";
+EFunction.    	Exp15 ::= Exp16 "(" [Exp] ")";
+
+-- level 14
+EReference.	Exp14 ::= Exp14 "." Exp15;
+EPointer.	Exp14 ::= Exp14 "->" Exp15;
+EIncrement.	Exp14 ::= Exp15 "++";
+EDecrement.	Exp14 ::= Exp15 "--";
+
+-- level 13
+EPreInc.	Exp13 ::= "++" Exp14;
+EPreDec.	Exp13 ::= "--" Exp14;
+ENegation.	Exp13 ::= "!"  Exp14;
+EDereference.	Exp13 ::= "*"  Exp14;
+
+-- level 12
+EMul.		Exp12 ::= Exp12 "*" Exp13;
+EDiv.		Exp12 ::= Exp12 "/" Exp13;
+EMod.		Exp12 ::= Exp12 "%" Exp13;
+
+-- level 11
+EAdd.		Exp11 ::= Exp11 "+" Exp12;
+ESub.		Exp11 ::= Exp11	"-" Exp12;
+
+-- level 10
+ELShift.	Exp10 ::= Exp10 "<<" Exp11;
+ERShift.	Exp10 ::= Exp10 ">>" Exp11;
+
+-- level 9
+ELess.		Exp9 ::= Exp9 "<" Exp10;
+EGreater.	Exp9 ::= Exp9 ">" Exp10;
+ELEqual.	Exp9 ::= Exp9 "<=" Exp10;
+EGEqual.	Exp9 ::= Exp9 ">=" Exp10;
+
+-- level 8
+EEqual.		Exp8 ::= Exp8 "==" Exp9;
+ENotEqual.	Exp8 ::= Exp8 "!=" Exp9;
+
+-- level 4
+EConjunction.	Exp4 ::= Exp4 "&&" Exp5;
+
+-- level 3
+EDisjunction.	Exp3 ::= Exp3 "||" Exp4;
+
+-- level 2
+EAss.		Exp2 ::= Exp3 "=" Exp2;
+EIncAss.	Exp2 ::= Exp3 "+=" Exp2;
+EDecAss.	Exp2 ::= Exp3 "-=" Exp2;
+EConditional.	Exp2 ::= Exp3 "?" Exp3 ":" Exp2 ;
+
+-- level 1
+EThrow.		Exp1 ::= "throw" Exp2;
+
+coercions Exp 16;
+separator Exp ",";
+
+------------------------------ VARIABLES -----------------------------------
+VLit.		Variable ::= Type Id;
+VIntalz. 	Variable ::= Type Id "=" Exp;
+VType.		Variable ::= Type Id "," [Id];
+VConst.		Variable ::= "const" Variable;
+separator nonempty Id ",";
+
+------------------------------ TYPES ---------------------------------------
+TQCon.	Type ::= QConstant;
+TInt.	Type ::= "int";
+TBool.	Type ::= "bool";
+TDabl.	Type ::= "double";
+TVoid.	Type ::= "void";
+TAmp.	Type ::= Type "&";
+
+------------------------------ ARGUMENTS -----------------------------------
+ALit.		Arg ::= Type Id;
+AIntalz. 	Arg ::= Type Id "=" Exp;
+AType.		Arg ::= Type;
+AConst.		Arg ::= "const" Type;
+AConst2.	Arg ::= "const" Type Id;
+AConst3.	Arg ::= "const" Type Id "=" Exp;
+separator Arg ",";
+
+------------------------------ QUALIFIED CONSTANTS -------------------------
+QCons.		QConstant ::= [Const];
+QIdent.		Const ::= Id;
+QTempCon.	Const ::= Id "<" [Type] ">";
+separator nonempty Type ",";
+separator nonempty Const "::";
+
+------------------------------ COMMENTS -------------------------------------
+comment "//" ;
+comment "/*" "*/" ;
+comment "#";
+
+token Id (letter (letter | digit | '_')*);
