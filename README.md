@@ -1,2 +1,2 @@
 # DAT151-PL
-Programming Language Technology - DAT151
+Programming Language Technology 
